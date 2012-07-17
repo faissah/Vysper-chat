@@ -42,8 +42,12 @@
     	<property name="PORT" value="9123"/>
 	</bean>
 	
-    <bean class="org.jahia.modules.minaChat.connect" >
+    <bean class="org.jahia.modules.minaChat.client.connect" >
         <property name="name" value="connectToChat"/>
+        <property name="XMPPServerName" value="localhost"/>
+        <property name="TLSCertificatePath" value="/Users/fabriceaissah/svn/minaChat/certificate/bogus_mina_tls.cert"/>
+        <property name="TLSCertificatePassword" value="boguspw"/>
+    	<property name="PORT" value="9123"/>
     </bean>
 
 

@@ -135,7 +135,7 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
         
         
 	}
-	
+	/*
 	protected XMPPConnection connectClient(int port, String username, String password) throws Exception {
         ConnectionConfiguration connectionConfiguration = new ConnectionConfiguration("localhost", port);
         connectionConfiguration.setCompressionEnabled(false);
@@ -163,5 +163,5 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
 
         // Wait up to 5 seconds for a result.
         return collector.nextResult(5000);
-    }
+    }*/
 }
