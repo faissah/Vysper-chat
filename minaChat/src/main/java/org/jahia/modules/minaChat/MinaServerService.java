@@ -1,22 +1,8 @@
 package org.jahia.modules.minaChat;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
-
-import org.apache.mina.core.service.IoAcceptor;
-import org.apache.mina.core.session.IdleStatus;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
-import org.apache.mina.filter.logging.LoggingFilter;
-import org.apache.mina.transport.socket.DatagramSessionConfig;
-import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.vysper.mina.TCPEndpoint;
 import org.apache.vysper.storage.StorageProviderRegistry;
 import org.apache.vysper.storage.inmemory.MemoryStorageProviderRegistry;
-import org.apache.vysper.storage.jcr.JcrStorageProviderRegistry;
 import org.apache.vysper.xmpp.addressing.Entity;
 import org.apache.vysper.xmpp.addressing.EntityImpl;
 import org.apache.vysper.xmpp.authorization.AccountCreationException;
@@ -26,20 +12,16 @@ import org.apache.vysper.xmpp.modules.extension.xep0054_vcardtemp.VcardTempModul
 import org.apache.vysper.xmpp.modules.extension.xep0119_xmppping.XmppPingModule;
 import org.apache.vysper.xmpp.modules.extension.xep0202_entity_time.EntityTimeModule;
 import org.apache.vysper.xmpp.server.XMPPServer;
-import org.jahia.services.JahiaAfterInitializationService;
-import org.jahia.services.content.JCRStoreService;
-
+import org.apache.vysper.xmpp.extension.xep0124.BoshEndpoint;
 import org.jahia.exceptions.JahiaException;
 import org.jahia.exceptions.JahiaInitializationException;
+import org.jahia.services.JahiaAfterInitializationService;
 import org.jahia.services.JahiaService;
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.PacketCollector;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.filter.PacketIDFilter;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.packet.Presence;
+import org.jahia.services.content.JCRStoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Arrays;
+import java.io.File;
 
 public class MinaServerService extends JahiaService implements JahiaAfterInitializationService {
     
@@ -48,13 +30,19 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
     private static Logger logger = LoggerFactory.getLogger(JCRStoreService.class);    
     
     
-    private int PORT;
-    private String XMPPServerName;
-    private String TLSCertificatePath;
-    private String TLSCertificatePassword;
+    int TcpPort;
+    int BoshPort;
+    String XMPPServerName;
+    String TLSCertificatePath;
+    String TLSCertificatePassword;
 
-    public void setPORT(int PORT) {
-        this.PORT = PORT;
+
+    public void setTcpPort(int TcpPort) {
+        this.TcpPort = TcpPort;
+    }
+
+    public void setBoshPort(int BoshPort) {
+        this.BoshPort = BoshPort;
     }
 
     public void setXMPPServerName(String XMPPServerName) {
@@ -68,6 +56,30 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
     public void setTLSCertificatePassword(String TLSCertificatePassword) {
         this.TLSCertificatePassword = TLSCertificatePassword;
     }
+
+    public int getTcpPort() {
+        logger.info("TcpPort: "+TcpPort);
+        return TcpPort;
+    }
+
+    public int getBoshPort() {
+        return BoshPort;
+    }
+
+    public String getXMPPServerName() {
+        logger.info("getXMPPServerName: "+XMPPServerName);
+        return XMPPServerName;
+    }
+
+    public String getTLSCertificatePath() {
+        return TLSCertificatePath;
+    }
+
+    public String getTLSCertificatePassword() {
+        return TLSCertificatePassword;
+    }
+
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -96,12 +108,16 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
 	    AccountManagement accountManagement = (AccountManagement) providerRegistry.retrieve(AccountManagement.class);  
 	    //AccountManagement accountManagement = (AccountManagement) providerRegistry.retrieve(JahiaAccountManagement.class);  
 	      
-	      
-	    Entity user = EntityImpl.parseUnchecked("user@"+XMPPServerName);  
-	    
+
+        Entity user = EntityImpl.parseUnchecked("user@"+XMPPServerName);
+        Entity user2 = EntityImpl.parseUnchecked("user2@"+XMPPServerName);
+
 	    try {
 			if(!accountManagement.verifyAccountExists(user)) {
 		        accountManagement.addUser(user, "password");
+		    }
+            if(!accountManagement.verifyAccountExists(user2)) {
+		        accountManagement.addUser(user2, "password");
 		    }
 	    }catch (AccountCreationException e) {
 			// TODO Auto-generated catch block
@@ -111,9 +127,16 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
 	    server.setStorageProviderRegistry(providerRegistry);  
 	      
         TCPEndpoint endpoint = new TCPEndpoint();
-        endpoint.setPort(PORT);
+        endpoint.setPort(TcpPort);
         server.addEndpoint(endpoint);
-        
+
+        BoshEndpoint boshEndpoint = new BoshEndpoint();
+        boshEndpoint.setPort(BoshPort);
+        boshEndpoint.setAccessControlAllowOrigin(Arrays.asList("*"));
+        //boshEndpoint.setSSLEnabled(true);
+        //boshEndpoint.setSSLCertificateInfo("src/main/resources/keystore","password");
+        boshEndpoint.setContextPath("/bosh");
+        server.addEndpoint(boshEndpoint);
         try {
 			server.setTLSCertificateInfo(new File(TLSCertificatePath), TLSCertificatePassword);
 			System.out.println("setTLSCertificateInfo: "+TLSCertificatePath);  	        
