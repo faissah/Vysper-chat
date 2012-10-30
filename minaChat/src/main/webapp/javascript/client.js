@@ -140,7 +140,7 @@ function rosterReceived(iq) {
 
 function addToRoster(jid) {
 	var id = jid2id(jid);
-	$("#roster").append("<div style='cursor: pointer;' jid='" + id + "'>" + jid + " (offline)</div>");
+	$("#roster").append("<div style='cursor: pointer;' jid='" + id + "'>" + jid2name(jid) + " (offline)</div>");
 	$("#roster > div[jid=" + id + "]").click(function() {
 		chatWith(jid);
 	});
@@ -153,6 +153,10 @@ function addToRoster(jid) {
 
 function jid2id(jid) {
 	return Strophe.getBareJidFromJid(jid).replace("@", "AT").replace(/\./g, "_");
+}
+
+function jid2name(jid) {
+	return Strophe.getBareJidFromJid(jid).substring(0,jid.indexOf("@"));
 }
 
 function messageReceived(msg) {
@@ -185,7 +189,7 @@ function verifyChatTab(jid) {
 	var bareJid = Strophe.getBareJidFromJid(jid);
 	$("#tabs").show();
 	if ($("#chat" + id).length === 0) {
-		$("#tabs").tabs("add", "#chat" + id, bareJid);
+		$("#tabs").tabs("add", "#chat" + id, jid2name(jid));
 		$("#chat" + id).append("<div style='height: 290px; margin-bottom: 10px; overflow: auto;'></div><input type='text' style='width: 100%;'/>");
 		$("#chat" + id).data("jid", jid);
 		$("#chat" + id + " > input").keydown(function(event) {
@@ -265,12 +269,14 @@ function presenceReceived(presence) {
 }
 
 function addContact() {
-	var toJid = prompt("Please type the username of the contact you want to add")+"@"+server;
+	var toJid = prompt("Please type the username of the contact you want to add");
 	var id = jid2id(toJid);
-	if (toJid === null) {
+	if (toJid == null) {
 		return;
 	}
-	if (toJid === jid) {
+    toJid+="@"+server
+    var id = jid2id(toJid);
+    if (toJid === jid) {
 		alert("You cannot add yourself to the roster!");
 		return;
 	}

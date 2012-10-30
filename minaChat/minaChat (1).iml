@@ -51,6 +51,7 @@
     <orderEntry type="module" module-name="jahia-api" scope="PROVIDED" />
     <orderEntry type="module" module-name="jahia-api" scope="PROVIDED" />
     <orderEntry type="module" module-name="jahia-api" scope="PROVIDED" />
+    <orderEntry type="module" module-name="jahia-api" scope="PROVIDED" />
     <orderEntry type="library" name="Maven: org.apache.mina:mina-core:2.0.4" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.mina:mina-integration-beans:2.0.4" level="project" />

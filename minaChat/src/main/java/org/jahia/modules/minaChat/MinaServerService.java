@@ -33,24 +33,22 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
     
     static private JCRStoreService instance = null;
 
-    private static Logger logger = LoggerFactory.getLogger(JCRStoreService.class);    
-    
-    
-    String TcpPort;
-    String BoshPort;
+    private static Logger logger = LoggerFactory.getLogger(JCRStoreService.class);
+
+
+    String password;
+
+    Integer tcpport;
+    Integer boshport;
+
     String XMPPServerName;
     String TLSCertificatePath;
     String TLSCertificatePassword;
     AccountManagement accountManagement;
 
-
-    public void setTcpPort(String TcpPort) {
-        this.TcpPort = TcpPort;
-    }
-
-    public void setBoshPort(String BoshPort) {
-        this.BoshPort = BoshPort;
-    }
+    public void setPassword(String password) {
+            this.password = password;
+        }
 
     public void setXMPPServerName(String XMPPServerName) {
         this.XMPPServerName = XMPPServerName;
@@ -64,13 +62,26 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
         this.TLSCertificatePassword = TLSCertificatePassword;
     }
 
-    public String getTcpPort() {
-        logger.info("TcpPort: "+TcpPort);
-        return TcpPort;
+
+    public Integer getTcpport() {
+        return tcpport;
     }
 
-    public String getBoshPort() {
-        return BoshPort;
+    public void setTcpport(Integer tcpport) {
+        this.tcpport = tcpport;
+    }
+
+    public Integer getBoshport() {
+        return boshport;
+    }
+
+    public void setBoshport(Integer boshport) {
+        this.boshport = boshport;
+    }
+
+
+    public String getPassword() {
+        return password;
     }
 
     public String getXMPPServerName() {
@@ -171,11 +182,11 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
 	    server.setStorageProviderRegistry(providerRegistry);  
 	      
         TCPEndpoint endpoint = new TCPEndpoint();
-        endpoint.setPort(Integer.parseInt(TcpPort));
+        endpoint.setPort(tcpport);
         server.addEndpoint(endpoint);
 
         BoshEndpoint boshEndpoint = new BoshEndpoint();
-        boshEndpoint.setPort(Integer.parseInt(BoshPort));
+        boshEndpoint.setPort(boshport);
         boshEndpoint.setAccessControlAllowOrigin(Arrays.asList("*"));
         //boshEndpoint.setSSLEnabled(true);
         //boshEndpoint.setSSLCertificateInfo("src/main/resources/keystore","password");
