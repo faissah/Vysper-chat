@@ -2,3 +2,5 @@
 <jmix = 'http://www.jahia.org/jahia/mix/1.0'>
 
 [jnt:minaChat] > jnt:content, mix:title, jmix:siteComponent
+
+[jmix:chatUser] mixin

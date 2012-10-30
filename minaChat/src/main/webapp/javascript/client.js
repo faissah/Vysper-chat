@@ -40,7 +40,7 @@ connectionStatuses[Strophe.Status.ATTACHED] = "ATTACHED";
 if(window.flensed) window.flensed.base_path="../resources/flxhr/";
 
 $(document).ready(function() {
-	$("#tabs").tabs();
+    $("#tabs").tabs();
 	$("#roster").dialog({
 		autoOpen: false,
 		buttons: {"Disconnect": disconnect, "Add contact...": addContact},
@@ -55,6 +55,7 @@ $(document).ready(function() {
 	$("#connect").click(function() {
 		$("#connect-form").hide();
 		$("#workspace").show();
+        $("#logger").dialog();
 		connect();
 	});
 });
@@ -168,7 +169,7 @@ function messageReceived(msg) {
 }
 
 function showMessage(tabId, authorJid, text) {
-	var bareJid = Strophe.getBareJidFromJid(authorJid);
+	var bareJid = Strophe.getNodeFromJid(authorJid);
 	var chat = $("#chat" + tabId + " > div");
 	if (chat.length === 0) {
 		return;
@@ -264,7 +265,7 @@ function presenceReceived(presence) {
 }
 
 function addContact() {
-	var toJid = prompt("Please type the JID of the contact you want to add");
+	var toJid = prompt("Please type the username of the contact you want to add")+"@"+server;
 	var id = jid2id(toJid);
 	if (toJid === null) {
 		return;

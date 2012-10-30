@@ -7,21 +7,27 @@ import org.apache.vysper.xmpp.addressing.Entity;
 import org.apache.vysper.xmpp.addressing.EntityImpl;
 import org.apache.vysper.xmpp.authorization.AccountCreationException;
 import org.apache.vysper.xmpp.authorization.AccountManagement;
+import org.apache.vysper.xmpp.extension.xep0124.BoshEndpoint;
 import org.apache.vysper.xmpp.modules.extension.xep0049_privatedata.PrivateDataModule;
 import org.apache.vysper.xmpp.modules.extension.xep0054_vcardtemp.VcardTempModule;
 import org.apache.vysper.xmpp.modules.extension.xep0119_xmppping.XmppPingModule;
 import org.apache.vysper.xmpp.modules.extension.xep0202_entity_time.EntityTimeModule;
 import org.apache.vysper.xmpp.server.XMPPServer;
-import org.apache.vysper.xmpp.extension.xep0124.BoshEndpoint;
+import org.jahia.data.applications.ApplicationBean;
 import org.jahia.exceptions.JahiaException;
 import org.jahia.exceptions.JahiaInitializationException;
 import org.jahia.services.JahiaAfterInitializationService;
 import org.jahia.services.JahiaService;
-import org.jahia.services.content.JCRStoreService;
+import org.jahia.services.content.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Arrays;
+
+import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryResult;
 import java.io.File;
+import java.util.Arrays;
 
 public class MinaServerService extends JahiaService implements JahiaAfterInitializationService {
     
@@ -30,18 +36,19 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
     private static Logger logger = LoggerFactory.getLogger(JCRStoreService.class);    
     
     
-    int TcpPort;
-    int BoshPort;
+    String TcpPort;
+    String BoshPort;
     String XMPPServerName;
     String TLSCertificatePath;
     String TLSCertificatePassword;
+    AccountManagement accountManagement;
 
 
-    public void setTcpPort(int TcpPort) {
+    public void setTcpPort(String TcpPort) {
         this.TcpPort = TcpPort;
     }
 
-    public void setBoshPort(int BoshPort) {
+    public void setBoshPort(String BoshPort) {
         this.BoshPort = BoshPort;
     }
 
@@ -57,12 +64,12 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
         this.TLSCertificatePassword = TLSCertificatePassword;
     }
 
-    public int getTcpPort() {
+    public String getTcpPort() {
         logger.info("TcpPort: "+TcpPort);
         return TcpPort;
     }
 
-    public int getBoshPort() {
+    public String getBoshPort() {
         return BoshPort;
     }
 
@@ -97,41 +104,78 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
 	public void stop() throws JahiaException {
 		// do nothing
 	}
-	
-	public void initAfterAllServicesAreStarted() throws JahiaInitializationException {
-		XMPPServer server = new XMPPServer(XMPPServerName);  
-	      
-		StorageProviderRegistry providerRegistry = new MemoryStorageProviderRegistry();  
-		//StorageProviderRegistry providerRegistry = new JcrStorageProviderRegistry();  
-	    //StorageProviderRegistry providerRegistry = new JahiaStorageProviderRegistry();  
-	      
-	    AccountManagement accountManagement = (AccountManagement) providerRegistry.retrieve(AccountManagement.class);  
-	    //AccountManagement accountManagement = (AccountManagement) providerRegistry.retrieve(JahiaAccountManagement.class);  
-	      
 
-        Entity user = EntityImpl.parseUnchecked("user@"+XMPPServerName);
-        Entity user2 = EntityImpl.parseUnchecked("user2@"+XMPPServerName);
+    private void connectAllusers(final String context) {
+        try {
+            JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<ApplicationBean>() {
+                public ApplicationBean doInJCR(JCRSessionWrapper session) throws RepositoryException {
+                    if (session.getWorkspace().getQueryManager() != null) {
+                        String query = "SELECT * FROM [jmix:chatUser]";
+                        Query q = session.getWorkspace().getQueryManager().createQuery(query, Query.JCR_SQL2);
+                        QueryResult qr = q.execute();
+                        final NodeIterator nodes = qr.getNodes();
+                        if (nodes.hasNext()) {
+                            JCRNodeWrapper nodeWrapper = (JCRNodeWrapper) nodes.next();
+                            addUser(nodeWrapper.getName());
+                        }
+                    }
+                    return null;
+                }
+            });
+        } catch (RepositoryException e) {
+            logger.error("Error while retrieving applicaion by context", e);
+        }
+    }
+
+    public void addUser(String username){
+        Entity user = EntityImpl.parseUnchecked(username+"@"+XMPPServerName);
 
 	    try {
 			if(!accountManagement.verifyAccountExists(user)) {
 		        accountManagement.addUser(user, "password");
-		    }
-            if(!accountManagement.verifyAccountExists(user2)) {
-		        accountManagement.addUser(user2, "password");
+                logger.info("User: "+ user + " added with password: password");
 		    }
 	    }catch (AccountCreationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}  
+		}
+    }
+
+	public void initAfterAllServicesAreStarted() throws JahiaInitializationException {
+		XMPPServer server = new XMPPServer(XMPPServerName);  
+	      
+		StorageProviderRegistry providerRegistry = new MemoryStorageProviderRegistry();  
+
+	    accountManagement = (AccountManagement) providerRegistry.retrieve(AccountManagement.class);
+
+        try {
+            JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<ApplicationBean>() {
+                public ApplicationBean doInJCR(JCRSessionWrapper session) throws RepositoryException {
+                    if (session.getWorkspace().getQueryManager() != null) {
+                        String query = "SELECT * FROM [jmix:chatUser]";
+                        Query q = session.getWorkspace().getQueryManager().createQuery(query, Query.JCR_SQL2);
+                        QueryResult qr = q.execute();
+                        final NodeIterator nodes = qr.getNodes();
+                        while (nodes.hasNext()) {
+                            JCRNodeWrapper nodeWrapper = (JCRNodeWrapper) nodes.next();
+                            addUser(nodeWrapper.getName());
+                        }
+                    }
+                    return null;
+                }
+            });
+        } catch (RepositoryException e) {
+            logger.error("Error while retrieving applicaion by context", e);
+        }
 	      
 	    server.setStorageProviderRegistry(providerRegistry);  
 	      
         TCPEndpoint endpoint = new TCPEndpoint();
-        endpoint.setPort(TcpPort);
+        endpoint.setPort(Integer.parseInt(TcpPort));
         server.addEndpoint(endpoint);
 
         BoshEndpoint boshEndpoint = new BoshEndpoint();
-        boshEndpoint.setPort(BoshPort);
+        boshEndpoint.setPort(Integer.parseInt(BoshPort));
         boshEndpoint.setAccessControlAllowOrigin(Arrays.asList("*"));
         //boshEndpoint.setSSLEnabled(true);
         //boshEndpoint.setSSLCertificateInfo("src/main/resources/keystore","password");

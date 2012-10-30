@@ -35,7 +35,7 @@
   </bean>
 
 
-	<bean id="MinaServerService" class="org.jahia.modules.minaChat.MinaServerService">
+	<bean id="MinaServerService" name="MinaServerService" class="org.jahia.modules.minaChat.MinaServerService">
         <property name="XMPPServerName" value="localhost"/>
         <property name="TLSCertificatePath" value="/Users/fabriceaissah/svn/Vysper-chat/certificate/bogus_mina_tls.cert"/>
         <property name="TLSCertificatePassword" value="boguspw"/>
@@ -49,6 +49,12 @@
         <property name="TLSCertificatePath" value="/Users/fabriceaissah/svn/Vysper-chat/certificate/bogus_mina_tls.cert"/>
         <property name="TLSCertificatePassword" value="boguspw"/>
     	<property name="PORT" value="9123"/>
+    </bean>
+
+
+    <bean class="org.jahia.modules.minaChat.client.registerUser" >
+        <property name="name" value="registerUser"/>
+        <property name="minaServerService" ref="MinaServerService"/>
     </bean>
 
 
