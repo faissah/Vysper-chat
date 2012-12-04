@@ -13,12 +13,14 @@ import org.apache.vysper.xmpp.modules.extension.xep0054_vcardtemp.VcardTempModul
 import org.apache.vysper.xmpp.modules.extension.xep0119_xmppping.XmppPingModule;
 import org.apache.vysper.xmpp.modules.extension.xep0202_entity_time.EntityTimeModule;
 import org.apache.vysper.xmpp.server.XMPPServer;
+import org.jahia.api.Constants;
 import org.jahia.data.applications.ApplicationBean;
 import org.jahia.exceptions.JahiaException;
 import org.jahia.exceptions.JahiaInitializationException;
 import org.jahia.services.JahiaAfterInitializationService;
 import org.jahia.services.JahiaService;
 import org.jahia.services.content.*;
+import org.jahia.utils.LanguageCodeConverters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,13 +33,9 @@ import java.util.Arrays;
 
 public class MinaServerService extends JahiaService implements JahiaAfterInitializationService {
     
-    static private JCRStoreService instance = null;
-
     private static Logger logger = LoggerFactory.getLogger(JCRStoreService.class);
 
-
     String password;
-
     Integer tcpport;
     Integer boshport;
 
@@ -61,7 +59,6 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
     public void setTLSCertificatePassword(String TLSCertificatePassword) {
         this.TLSCertificatePassword = TLSCertificatePassword;
     }
-
 
     public Integer getTcpport() {
         return tcpport;
@@ -103,7 +100,8 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
 	 * 
 	 * @see org.jahia.services.JahiaService#start()
 	 */
-	public void start() throws JahiaInitializationException {
+	@Override
+    public void start() throws JahiaInitializationException {
 		// do nothing
 	}
 
@@ -112,20 +110,22 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
 	 * 
 	 * @see org.jahia.services.JahiaService#stop()
 	 */
-	public void stop() throws JahiaException {
+	@Override
+    public void stop() throws JahiaException {
 		// do nothing
 	}
 
-    private void connectAllusers(final String context) {
+    private void connectAllusers() {
         try {
             JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<ApplicationBean>() {
                 public ApplicationBean doInJCR(JCRSessionWrapper session) throws RepositoryException {
                     if (session.getWorkspace().getQueryManager() != null) {
+                        JCRSessionWrapper defaultsession = JCRSessionFactory.getInstance().getCurrentUserSession(Constants.LIVE_WORKSPACE);
                         String query = "SELECT * FROM [jmix:chatUser]";
-                        Query q = session.getWorkspace().getQueryManager().createQuery(query, Query.JCR_SQL2);
+                        Query q = defaultsession.getWorkspace().getQueryManager().createQuery(query, Query.JCR_SQL2);
                         QueryResult qr = q.execute();
                         final NodeIterator nodes = qr.getNodes();
-                        if (nodes.hasNext()) {
+                        while (nodes.hasNext()) {
                             JCRNodeWrapper nodeWrapper = (JCRNodeWrapper) nodes.next();
                             addUser(nodeWrapper.getName());
                         }
@@ -134,7 +134,7 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
                 }
             });
         } catch (RepositoryException e) {
-            logger.error("Error while retrieving applicaion by context", e);
+            logger.error("Error while retrieving application by context", e);
         }
     }
 
@@ -145,7 +145,9 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
 			if(!accountManagement.verifyAccountExists(user)) {
 		        accountManagement.addUser(user, "password");
                 logger.info("User: "+ user + " added with password: password");
-		    }
+		    }else{
+                logger.info("User: "+ user + " already registrered");
+            }
 	    }catch (AccountCreationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -159,28 +161,10 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
 
 	    accountManagement = (AccountManagement) providerRegistry.retrieve(AccountManagement.class);
 
-        try {
-            JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<ApplicationBean>() {
-                public ApplicationBean doInJCR(JCRSessionWrapper session) throws RepositoryException {
-                    if (session.getWorkspace().getQueryManager() != null) {
-                        String query = "SELECT * FROM [jmix:chatUser]";
-                        Query q = session.getWorkspace().getQueryManager().createQuery(query, Query.JCR_SQL2);
-                        QueryResult qr = q.execute();
-                        final NodeIterator nodes = qr.getNodes();
-                        while (nodes.hasNext()) {
-                            JCRNodeWrapper nodeWrapper = (JCRNodeWrapper) nodes.next();
-                            addUser(nodeWrapper.getName());
-                        }
-                    }
-                    return null;
-                }
-            });
-        } catch (RepositoryException e) {
-            logger.error("Error while retrieving applicaion by context", e);
-        }
+
 	      
 	    server.setStorageProviderRegistry(providerRegistry);  
-	      
+	    logger.info("boshport:" + boshport + " tcpport:" + tcpport + " password: " + password);
         TCPEndpoint endpoint = new TCPEndpoint();
         endpoint.setPort(tcpport);
         server.addEndpoint(endpoint);
@@ -198,7 +182,6 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
 			System.out.println("setTLSCertificatePwd: "+TLSCertificatePassword);  	        
 		    server.start();  
 			System.out.println("Vysper server is running...");
-			
 		      
 		    server.addModule(new EntityTimeModule());  
 		    server.addModule(new VcardTempModule());  
@@ -210,36 +193,6 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        
-        
+        connectAllusers();
 	}
-	/*
-	protected XMPPConnection connectClient(int port, String username, String password) throws Exception {
-        ConnectionConfiguration connectionConfiguration = new ConnectionConfiguration("localhost", port);
-        connectionConfiguration.setCompressionEnabled(false);
-        connectionConfiguration.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
-        connectionConfiguration.setSASLAuthenticationEnabled(true);
-        connectionConfiguration.setDebuggerEnabled(false);
-        connectionConfiguration.setKeystorePath("src/main/config/bogus_mina_tls.cert");
-        connectionConfiguration.setTruststorePath("src/main/config/bogus_mina_tls.cert");
-        connectionConfiguration.setTruststorePassword("boguspw");
-
-        XMPPConnection.DEBUG_ENABLED = true;
-        XMPPConnection client = new XMPPConnection(connectionConfiguration);
-
-        client.connect();
-
-        client.login(username, password);
-        return client;
-    }
-	
-	protected Packet sendSync(XMPPConnection client, Packet request) {
-        // Create a packet collector to listen for a response.
-        PacketCollector collector = client.createPacketCollector(new PacketIDFilter(request.getPacketID()));
-
-        client.sendPacket(request);
-
-        // Wait up to 5 seconds for a result.
-        return collector.nextResult(5000);
-    }*/
 }

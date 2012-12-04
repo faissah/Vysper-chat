@@ -1,10 +1,12 @@
 package org.jahia.modules.minaChat.client;
 
+import org.jahia.api.Constants;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.bin.Render;
 import org.jahia.modules.minaChat.MinaServerService;
 import org.jahia.services.content.JCRNodeWrapper;
+import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
@@ -23,8 +25,9 @@ import java.util.Map;
  * Time: 4:11 PM
  * To change this template use File | Settings | File Templates.
  */
-public class registerUser extends Action {
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(registerUser.class);
+
+public class RegisterUser extends Action {
+    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(RegisterUser.class);
     private MinaServerService minaServerService;
 
     public void setMinaServerService(MinaServerService minaServerService){
@@ -37,15 +40,18 @@ public class registerUser extends Action {
         String nodePath = session.getUser().getLocalPath();
         JCRNodeWrapper node = session.getNode(nodePath);
         JCRSessionWrapper jcrSessionWrapper = node.getSession();
+
         if(!node.isNodeType("jmix:chatUser")) {
             node.checkout();
             node.addMixin("jmix:chatUser");
             jcrSessionWrapper.save();
             logger.info("mixin chatUser added to user:" + node.getPath());
+        }else{
+            logger.info(node.getDisplayableName() + " already added to mina chat");
         }
 
         minaServerService.addUser(node.getName());
-        logger.info(node.getDisplayableName() + "added to mina chat");
+
 
         return new ActionResult(HttpServletResponse.SC_OK, node.getPath(), Render.serializeNodeToJSON(node));
     }

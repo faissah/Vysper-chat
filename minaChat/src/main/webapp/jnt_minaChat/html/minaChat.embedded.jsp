@@ -1,11 +1,10 @@
 <%@ page import="org.jahia.services.SpringContextSingleton" %>
-<%@ page import="org.jahia.bin.Jahia"%>
 <%@ taglib prefix="jcr" uri="http://www.jahia.org/tags/jcr" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <%@ taglib prefix="functions" uri="http://www.jahia.org/tags/functions" %>
-<template:addResources type="javascript" resources="jquery.form.js,jquery.min.js,jquery.jeditable.js,jquery-ui.min.js,strophe.js,strophe.flxhr.js,client.js,flensed.js"/>
+<template:addResources type="javascript" resources="jquery.form.js,jquery.min.js,jquery.jeditable.js,jquery-ui.min.js,strophe.js,strophe.flxhr.js,client.embedded.js,flensed.js"/>
 <template:addResources type="css" resources="le-frog/jquery-ui-1.8.13.custom.css"/>
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%
@@ -13,13 +12,6 @@ pageContext.setAttribute("minaService",SpringContextSingleton.getBean("MinaServe
 %>
 
 <div id="minaChat" title="MinaChat">
-    <script type="text/javascript">
-        function connectChat() {
-            $('#jahia-connect-${currentNode.UUID}').ajaxSubmit(function(){
-                 location.reload();
-            }, "json");
-        }
-    </script>
    <jcr:node var="userNode" path="${currentUser.localPath}"/>
 <c:if test="${not empty userNode}">
     <c:choose>
@@ -64,3 +56,8 @@ pageContext.setAttribute("minaService",SpringContextSingleton.getBean("MinaServe
 
 </div>
 </div>
+    <script type="text/javascript">
+        function connectChat() {
+            $('#jahia-connect-${currentNode.UUID}').ajaxSubmit(function(){location.reload();});
+        }
+    </script>

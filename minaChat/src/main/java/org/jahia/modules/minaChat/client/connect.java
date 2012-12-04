@@ -1,41 +1,33 @@
 package org.jahia.modules.minaChat.client;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.jahia.bin.Action;
-import org.apache.commons.lang.StringUtils;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
-import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
-import org.jahia.services.sites.JahiaSitesService;
-import org.jahia.services.usermanager.JahiaGroupManagerService;
-import org.jahia.services.usermanager.JahiaUserManagerService;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketIDFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
+import org.slf4j.Logger;
 
-public class connect extends Action {
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(connect.class);
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
+
+public class Connect extends Action {
+    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(Connect.class);
     protected XMPPConnection client;
 
-    
-    private int PORT;
+    private int port;
     private String XMPPServerName;
     private String TLSCertificatePath;
     private String TLSCertificatePassword;
 
     public void setPORT(int PORT) {
-        this.PORT = PORT;
+        this.port = port;
     }
 
     public void setXMPPServerName(String XMPPServerName) {
@@ -49,19 +41,19 @@ public class connect extends Action {
     public void setTLSCertificatePassword(String TLSCertificatePassword) {
         this.TLSCertificatePassword = TLSCertificatePassword;
     }
-    
+
     @Override
 	public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
-        
-    	client = connectClient(PORT, "user@"+XMPPServerName, "password");
+
+    	client = connectClient(port, "user@"+XMPPServerName, "password");
         Presence presence = new Presence(Presence.Type.unavailable);
         presence.setStatus("Gone fishing");
         sendSync(client,presence);
-    	
+
         return ActionResult.OK_JSON;
     }
-    
-	
+
+
 	protected XMPPConnection connectClient(int port, String username, String password) throws Exception {
         ConnectionConfiguration connectionConfiguration = new ConnectionConfiguration(XMPPServerName, port);
         connectionConfiguration.setCompressionEnabled(false);
@@ -80,7 +72,7 @@ public class connect extends Action {
         client.login(username, password);
         return client;
     }
-	
+
 	protected Packet sendSync(XMPPConnection client, Packet request) {
         // Create a packet collector to listen for a response.
         PacketCollector collector = client.createPacketCollector(new PacketIDFilter(request.getPacketID()));

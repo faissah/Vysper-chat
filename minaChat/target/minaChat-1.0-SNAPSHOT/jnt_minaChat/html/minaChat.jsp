@@ -1,12 +1,11 @@
 <%@ page import="org.jahia.services.SpringContextSingleton" %>
-<%@ page import="org.jahia.bin.Jahia"%>
 <%@ taglib prefix="jcr" uri="http://www.jahia.org/tags/jcr" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <%@ taglib prefix="functions" uri="http://www.jahia.org/tags/functions" %>
 <template:addResources type="css" resources="le-frog/jquery-ui-1.8.13.custom.css"/>
-<template:addResources type="javascript" resources="jquery.form.js,jquery.min.js,jquery.jeditable.js,jquery-ui.min.js,strophe.js,strophe.flxhr.js,client.js,flensed.js"/>
+<template:addResources type="javascript" resources="jquery.min.js,jquery-ui.min.js,jquery.form.js"/>
 
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%
@@ -16,13 +15,7 @@ pageContext.setAttribute("minaService",SpringContextSingleton.getBean("MinaServe
 
 
 <div id="minaChat" title="MinaChat">
-    <script type="text/javascript">
-        function connectChat() {
-            $('#jahia-register-${currentNode.UUID}').ajaxSubmit(function(){
-                 location.reload();
-            }, "json");
-        }
-    </script>
+
    <jcr:node var="userNode" path="${currentUser.localPath}"/>
 <c:if test="${not empty userNode}">
     <c:choose>
@@ -33,12 +26,18 @@ pageContext.setAttribute("minaService",SpringContextSingleton.getBean("MinaServe
             </div>
         </c:when>
         <c:otherwise>
-            <c:url value="${url.base}${currentNode.path}.popup.html.ajax" var="theUrl">
+            <c:url value="${url.base}${currentNode.path}.popup.hidden.html.ajax" var="theUrl">
                 <c:param name="includeJavascripts" value="true"/>
             </c:url>
 
-            <input type="button" id="openCHat" value="openCHat" style="float: left; margin-top: 5px;" onclick="window.open('${theUrl}','jahia-chat-${currentNode.name}','width=400,height=400')"/>
+            <input type="button" id="openCHat" value="open chat" style="float: left; margin-top: 5px;" onclick="window.open('${theUrl}','jahia-chat-${currentNode.name}','width=400,height=400')"/>
+            <input type="button" id="disconnect" value="disconnect" style="float: left; margin-top: 5px;"/>
         </c:otherwise>
     </c:choose>
 </c:if>
 </div>
+<script type="text/javascript">
+    function connectChat() {
+        $('#jahia-register-${currentNode.UUID}').ajaxSubmit(function(){location.reload();});
+    }
+</script>

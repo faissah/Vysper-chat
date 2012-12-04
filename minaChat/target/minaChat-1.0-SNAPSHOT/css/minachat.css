@@ -1,0 +1,11 @@
+#logger{
+    background: none repeat scroll 0 0 window;
+    bottom: 0;
+    height: 300px;
+    margin: 2px;
+    overflow: auto;
+    padding: 4px;
+    position: absolute;
+    right: 0;
+    width: 400px;
+}

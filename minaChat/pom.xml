@@ -46,131 +46,39 @@
     <parent>
         <artifactId>jahia-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
-        <version>6.6.1.0</version>
+        <version>6.6.1.2-SNAPSHOT</version>
     </parent>
     <groupId>org.jahia.modules</groupId>
     <artifactId>minaChat</artifactId>
     <name>Chat</name>
     <version>1.0-SNAPSHOT</version>    
     <packaging>war</packaging>
+    <repositories>
+        <repository>
+            <id>jahiaRepository</id>
+            <name>Jahia's Maven Repository</name>
+            <url>http://maven.jahia.org/maven2</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jahiaRepository</id>
+            <name>Jahia's Maven Repository</name>
+            <url>http://maven.jahia.org/maven2</url>
+        </pluginRepository>
+    </pluginRepositories>
     <description>This is the custom module (Chat) for running on a Jahia server.</description>
     <dependencies>
 		<dependency> 
             <groupId>org.apache.mina</groupId> 
             <artifactId>mina-core</artifactId> 
             <version>2.0.4</version> 
-        </dependency> 
-        <dependency> 
-            <groupId>org.apache.mina</groupId> 
-            <artifactId>mina-integration-beans</artifactId> 
-            <version>2.0.4</version> 
-            <exclusions>
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-core</artifactId> 
-                </exclusion> 
-            </exclusions> 
-        </dependency> 
-        <dependency> 
-            <groupId>org.apache.mina</groupId> 
-            <artifactId>mina-integration-ognl</artifactId> 
-            <version>2.0.4</version> 
-            <exclusions> 
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-core</artifactId> 
-                </exclusion> 
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-integration-beans</artifactId> 
-                </exclusion>
-				<exclusion>
-					<groupId>javassist</groupId>
-					<artifactId>javassist</artifactId>
-				</exclusion>               
-            </exclusions> 
-        </dependency> 
-        <dependency> 
-            <groupId>org.apache.mina</groupId> 
-            <artifactId>mina-integration-jmx</artifactId> 
-            <version>2.0.4</version> 
-            <exclusions> 
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-core</artifactId> 
-                </exclusion> 
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-integration-beans</artifactId> 
-                </exclusion> 
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-integration-ognl</artifactId> 
-                </exclusion> 
-            </exclusions> 
         </dependency>
         <dependency> 
             <groupId>org.apache.mina</groupId> 
             <artifactId>mina-statemachine</artifactId> 
-            <version>2.0.4</version> 
-            <exclusions> 
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-core</artifactId> 
-                </exclusion> 
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-integration-beans</artifactId> 
-                </exclusion> 
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-integration-ognl</artifactId> 
-                </exclusion>
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-integration-jmx</artifactId> 
-                </exclusion>  
-            </exclusions> 
+            <version>2.0.4</version>
         </dependency>
-        <dependency> 
-            <groupId>org.apache.mina</groupId> 
-            <artifactId>mina-example</artifactId> 
-            <version>2.0.4</version> 
-            <exclusions> 
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-core</artifactId> 
-                </exclusion> 
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-integration-beans</artifactId> 
-                </exclusion> 
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-integration-ognl</artifactId> 
-                </exclusion> 
-                 <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-integration-jmx</artifactId> 
-                </exclusion>
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId> 
-                    <artifactId>mina-statemachine</artifactId> 
-                </exclusion>
-                <exclusion> 
-                	<groupId>org.springframework</groupId>
-        			<artifactId>spring</artifactId>
-        		</exclusion>
-                <exclusion>
-                	<artifactId>jcl-over-slf4j</artifactId>
-                	<groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion> 
-                    <groupId>org.apache.mina</groupId>
-                    <artifactId>mina-integration-beans</artifactId> 
-                </exclusion> 
-            </exclusions> 
-		</dependency>
 		<dependency>
 			<groupId>org.apache.vysper</groupId>
 			<artifactId>vysper-core</artifactId>
@@ -187,20 +95,6 @@
 	        <version>0.7</version>
         </dependency>
 	</dependencies>
-    <repositories>
-        <repository>
-            <id>jahiaRepository</id>
-            <name>Jahia's Maven Repository</name>
-            <url>http://maven.jahia.org/maven2</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>jahiaRepository</id>
-            <name>Jahia's Maven Repository</name>
-            <url>http://maven.jahia.org/maven2</url>
-        </pluginRepository>
-    </pluginRepositories>
     <build>
         <plugins>
             <plugin>

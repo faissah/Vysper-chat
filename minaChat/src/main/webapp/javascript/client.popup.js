@@ -39,9 +39,10 @@ connectionStatuses[Strophe.Status.ATTACHED] = "ATTACHED";
 // this is needed by flXHR to automatically include its dependencies
 if(window.flensed) window.flensed.base_path="../resources/flxhr/";
 
+
 $(document).ready(function() {
     $("#tabs").tabs();
-	$("#roster").dialog({
+	$("#roster").show({
 		autoOpen: false,
 		buttons: {"Disconnect": disconnect, "Add contact...": addContact},
 		closeOnEscape: false,
@@ -52,13 +53,25 @@ $(document).ready(function() {
 		beforeclose: function() {return isDisconnecting;}
 	});
 
-	$("#connect").click(function() {
-		$("#connect-form").hide();
-		$("#workspace").show();
-        $("#logger").dialog();
-		connect();
-	});
+    $("#connect-form").hide();
+    $("#workspace").show();
+    $("#logger").hide();
+    connect();
+
+    $("#disconnect").click(function() {
+    disconnect();
+    close();
 });
+$("#togglelog").click(function() {
+    $("#logger").toggle();
+});
+$("#addcontact").click(function() {
+    addContact();
+});
+});
+
+
+
 
 function formatTime(val) {
 	return val < 10 ? "0" + val : val;

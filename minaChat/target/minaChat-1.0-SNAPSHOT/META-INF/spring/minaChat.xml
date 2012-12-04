@@ -34,26 +34,27 @@
     </property>
   </bean>
 
-
+<!-- En gros, si je veux utiliser ca en prod, je dois "forker" le module pour changer les confs -->
+<!-- A voir si on peut pas sortir ca dans jahia.properties, ou l'ecrire dans le JCR -->
 	<bean id="MinaServerService" name="MinaServerService" class="org.jahia.modules.minaChat.MinaServerService">
-        <property name="XMPPServerName" value="localhost"/>
-        <property name="TLSCertificatePath" value="/Users/fabriceaissah/svn/Vysper-chat/certificate/bogus_mina_tls.cert"/>
-        <property name="TLSCertificatePassword" value="boguspw"/>
-        <property name="tcpport" value="9123"/>
-        <property name="boshport" value="5280"/>
-        <property name="password" value="password"/>
+        <property name="XMPPServerName" value="${minaChat.XMPPServerName:localhost}"/>
+        <property name="TLSCertificatePath" value="${minaChat.TLSCertificatePath:/Users/fabriceaissah/svn/Vysper-chat/certificate/bogus_mina_tls.cert}"/>
+        <property name="TLSCertificatePassword" value="${minaChat.TLSCertificatePassword:boguspw}"/>
+        <property name="tcpport" value="${minaChat.tcpport:9123}"/>
+        <property name="boshport" value="${minaChat.boshport:5280}"/>
+        <property name="password" value="${minaChat.password:password}"/>
     </bean>
 	
-    <bean class="org.jahia.modules.minaChat.client.connect" >
+    <bean class="org.jahia.modules.minaChat.client.Connect" >
         <property name="name" value="connectToChat"/>
-        <property name="XMPPServerName" value="localhost"/>
-        <property name="TLSCertificatePath" value="/Users/fabriceaissah/svn/Vysper-chat/certificate/bogus_mina_tls.cert"/>
-        <property name="TLSCertificatePassword" value="boguspw"/>
-    	<property name="PORT" value="9123"/>
+        <property name="XMPPServerName" value="${minaChat.XMPPServerName:localhost}"/>
+        <property name="TLSCertificatePath" value="${minaChat.TLSCertificatePath:/Users/fabriceaissah/svn/Vysper-chat/certificate/bogus_mina_tls.cert}"/>
+        <property name="TLSCertificatePassword" value="${minaChat.TLSCertificatePassword:boguspw}"/>
+    	<property name="PORT" value="${minaChat.tcpport:9123}"/>
     </bean>
 
 
-    <bean class="org.jahia.modules.minaChat.client.registerUser" >
+    <bean class="org.jahia.modules.minaChat.client.RegisterUser" >
         <property name="name" value="registerUser"/>
         <property name="minaServerService" ref="MinaServerService"/>
     </bean>
