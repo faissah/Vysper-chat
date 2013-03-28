@@ -121,7 +121,7 @@ public class MinaServerService extends JahiaService implements JahiaAfterInitial
                 public ApplicationBean doInJCR(JCRSessionWrapper session) throws RepositoryException {
                     if (session.getWorkspace().getQueryManager() != null) {
                         JCRSessionWrapper defaultsession = JCRSessionFactory.getInstance().getCurrentUserSession(Constants.LIVE_WORKSPACE);
-                        String query = "SELECT * FROM [jmix:chatUser]";
+                        String query = "SELECT * FROM [chatmix:chatUser]";
                         Query q = defaultsession.getWorkspace().getQueryManager().createQuery(query, Query.JCR_SQL2);
                         QueryResult qr = q.execute();
                         final NodeIterator nodes = qr.getNodes();

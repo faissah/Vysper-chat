@@ -41,9 +41,9 @@ public class RegisterUser extends Action {
         JCRNodeWrapper node = session.getNode(nodePath);
         JCRSessionWrapper jcrSessionWrapper = node.getSession();
 
-        if(!node.isNodeType("jmix:chatUser")) {
+        if(!node.isNodeType("chatmix:chatUser")) {
             node.checkout();
-            node.addMixin("jmix:chatUser");
+            node.addMixin("chatmix:chatUser");
             jcrSessionWrapper.save();
             logger.info("mixin chatUser added to user:" + node.getPath());
         }else{

@@ -15,7 +15,7 @@ pageContext.setAttribute("minaService",SpringContextSingleton.getBean("MinaServe
    <jcr:node var="userNode" path="${currentUser.localPath}"/>
 <c:if test="${not empty userNode}">
     <c:choose>
-         <c:when test="${!jcr:isNodeType(userNode, 'jmix:chatUser')}">
+         <c:when test="${!jcr:isNodeType(userNode, 'chatmix:chatUser')}">
             <div id="register_user" style="width: 300px; height: 100px; float: left;">
                 <form action="<c:url value='${url.base}${currentNode.path}.registerUser.do'/>" method="post" id="jahia-connect-${currentNode.UUID}"></form>
                 <input type="button" id="register" value="register" style="float: left; margin-top: 5px;" onclick="connectChat(); return false;"/>

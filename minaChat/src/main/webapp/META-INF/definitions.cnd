@@ -1,6 +1,10 @@
 <jnt = 'http://www.jahia.org/jahia/nt/1.0'>
 <jmix = 'http://www.jahia.org/jahia/mix/1.0'>
+<chatnt = 'http://www.chat.jahia.com/jahia/nt/1.0'>
+<chatmix = 'http://www.chat.jahia.com/jahia/mix/1.0'>
 
-[jnt:minaChat] > jnt:content, mix:title, jmix:siteComponent
+[chatmix:chatModules] > jmix:droppableContent, jmix:editorialContent mixin
 
-[jmix:chatUser] mixin
+[chatnt:minaChat] > jnt:content, mix:title, chatmix:chatModules
+
+[chatmix:chatUser] mixin
